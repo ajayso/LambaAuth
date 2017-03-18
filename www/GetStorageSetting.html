@@ -1,0 +1,68 @@
+<html>
+<head>
+  <title>Storage Settings</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.3.7.min.js"></script>
+	<script>
+  AWS.config.region = '<REGION>';
+	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: '<IDENTITY_POOL_ID>'
+  });
+  var lambda = new AWS.Lambda();
+	</script>
+  <h1>Storage Settings</h1>
+  <div id="info">
+  Settings
+  </div>
+  <table>
+    <tr>
+      <td>DeploymentName</td>
+      <td><input type="text" id="deploymentName" size="20">
+    </tr>
+    
+    <tr>
+      <td colspan="2">
+        <button id="change-button">Get Settings </button>
+      </td>
+    </tr>
+		<tr>
+      <td colspan="2" class="center">
+				<a href="index.html">Back</a>
+      </td>
+    </tr>
+  </table>
+  <script>
+  var deploymentName = document.getElementById('deploymentName');
+  var changeButton = document.getElementById('change-button');
+  changeButton.addEventListener('click', function() {
+    info.innerHTML = 'Getting Storage Settings ...';
+    if (deploymentName.value == null || deploymentName.value == '') {
+      info.innerHTML = 'Please specify your deploymentName.';
+    } else {
+      var input = {
+        DeploymentName: deploymentName
+      };
+      lambda.invoke({
+        FunctionName: 'LambaAuthStorageSettings',
+        Payload: JSON.stringify(input)
+      }, function(err, data) {
+        if (err) console.log(err, err.stack);
+        else {
+          var output = JSON.parse(data.Payload);
+					console.log(data);
+					
+          if (!data) {
+            info.innerHTML = '<b>No</b> data found in';
+          } else {
+            info.innerHTML = 'Data Found: ' + data + '<br>';
+			
+        	}
+        }
+      });
+    }
+  });
+  </script>
+</body>
+</html>
